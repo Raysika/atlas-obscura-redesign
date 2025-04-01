@@ -1,6 +1,10 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PlaceCard from './PlaceCard';
+import { Input } from '@/components/ui/input';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Search, FilterX } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const placesData = [
   {
@@ -53,7 +57,47 @@ const placesData = [
   },
 ];
 
+// Extract unique categories from places data
+const uniqueCategories = [...new Set(placesData.map(place => place.category))];
+
 const PlacesGrid = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [filteredPlaces, setFilteredPlaces] = useState(placesData);
+
+  // Filter places based on search query and selected categories
+  useEffect(() => {
+    let results = placesData;
+    
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      results = results.filter(place => 
+        place.title.toLowerCase().includes(query) || 
+        place.description.toLowerCase().includes(query) ||
+        place.location.toLowerCase().includes(query)
+      );
+    }
+    
+    // Filter by selected categories
+    if (selectedCategories.length > 0) {
+      results = results.filter(place => selectedCategories.includes(place.category));
+    }
+    
+    setFilteredPlaces(results);
+  }, [searchQuery, selectedCategories]);
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchQuery('');
+    setSelectedCategories([]);
+  };
+
+  // Handle category filter change
+  const handleCategoryChange = (categories: string[]) => {
+    setSelectedCategories(categories);
+  };
+
   return (
     <section id="places" className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -64,8 +108,70 @@ const PlacesGrid = () => {
           </p>
         </div>
         
+        {/* Search and Filter Controls */}
+        <div className="mb-8 space-y-6">
+          {/* Search Input */}
+          <div className="relative max-w-2xl mx-auto">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search places by name, description or location..."
+              className="pl-10 py-6 text-base"
+            />
+          </div>
+          
+          {/* Category Filters */}
+          <div className="flex flex-col items-center space-y-3">
+            <h3 className="text-md font-medium">Filter by Category</h3>
+            <div className="flex flex-wrap justify-center gap-2">
+              <ToggleGroup 
+                type="multiple" 
+                value={selectedCategories}
+                onValueChange={handleCategoryChange}
+                className="justify-center"
+              >
+                {uniqueCategories.map((category) => (
+                  <ToggleGroupItem 
+                    key={category} 
+                    value={category}
+                    className="px-3 py-1 text-sm rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
+                    {category}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </div>
+            
+            {/* Clear Filters Button - Only show when filters are active */}
+            {(searchQuery || selectedCategories.length > 0) && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={clearFilters}
+                className="text-gray-500 flex items-center gap-1"
+              >
+                <FilterX className="h-4 w-4" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {/* Results Count */}
+        <div className="text-center mb-8">
+          <p className="text-gray-600">
+            {filteredPlaces.length === 0 ? (
+              "No places found. Try adjusting your filters."
+            ) : (
+              `Showing ${filteredPlaces.length} ${filteredPlaces.length === 1 ? 'place' : 'places'}`
+            )}
+          </p>
+        </div>
+        
+        {/* Places Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {placesData.map((place) => (
+          {filteredPlaces.map((place) => (
             <PlaceCard
               key={place.id}
               id={place.id}
@@ -78,25 +184,28 @@ const PlacesGrid = () => {
           ))}
         </div>
         
-        <div className="mt-12 text-center">
-          <button className="inline-flex items-center text-primary font-medium hover:underline">
-            View all places
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
-            </svg>
-          </button>
-        </div>
+        {/* Show this only when there are places and the view isn't filtered */}
+        {filteredPlaces.length === placesData.length && (
+          <div className="mt-12 text-center">
+            <button className="inline-flex items-center text-primary font-medium hover:underline">
+              View all places
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 ml-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
