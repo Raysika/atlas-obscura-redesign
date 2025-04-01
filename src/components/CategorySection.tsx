@@ -9,13 +9,15 @@ interface CategoryCardProps {
   count: number;
   color: string;
   className?: string;
+  onClick: () => void;
 }
 
-const CategoryCard = ({ icon, title, count, color, className }: CategoryCardProps) => {
+const CategoryCard = ({ icon, title, count, color, className, onClick }: CategoryCardProps) => {
   return (
     <div 
+      onClick={onClick}
       className={cn(
-        "flex flex-col items-center p-6 rounded-lg transition-all duration-300 hover:shadow-lg group",
+        "flex flex-col items-center p-6 rounded-lg transition-all duration-300 hover:shadow-lg group cursor-pointer",
         className
       )}
     >
@@ -37,42 +39,52 @@ const categories = [
   {
     icon: <MapPin size={24} />,
     title: "Natural Wonders",
+    category: "Natural Wonder",
     count: 1243,
     color: "bg-blue-500"
   },
   {
     icon: <Coffee size={24} />,
     title: "Food & Drink",
+    category: "Food & Drink",
     count: 865,
     color: "bg-amber-500"
   },
   {
     icon: <MapIcon size={24} />,
     title: "Abandoned Places",
+    category: "Abandoned Places",
     count: 642,
     color: "bg-gray-700"
   },
   {
     icon: <BookOpen size={24} />,
     title: "Ancient History",
+    category: "Historical Site",
     count: 927,
     color: "bg-green-600"
   },
   {
     icon: <Camera size={24} />,
     title: "Architecture",
+    category: "Architectural Marvel",
     count: 1156,
     color: "bg-purple-500"
   },
   {
     icon: <Compass size={24} />,
     title: "Hidden Gems",
+    category: "Hidden Gem",
     count: 783,
     color: "bg-red-500"
   }
 ];
 
-const CategorySection = () => {
+interface CategorySectionProps {
+  onCategorySelect: (category: string) => void;
+}
+
+const CategorySection = ({ onCategorySelect }: CategorySectionProps) => {
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
@@ -91,6 +103,14 @@ const CategorySection = () => {
               title={category.title}
               count={category.count}
               color={category.color}
+              onClick={() => {
+                onCategorySelect(category.category);
+                // Scroll to places section
+                const placesSection = document.getElementById('places');
+                if (placesSection) {
+                  placesSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
             />
           ))}
         </div>
