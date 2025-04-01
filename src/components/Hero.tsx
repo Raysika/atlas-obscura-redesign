@@ -2,8 +2,28 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const Hero = () => {
+interface HeroProps {
+  onCategorySelect: (category: string) => void;
+}
+
+const Hero = ({ onCategorySelect }: HeroProps) => {
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Scroll to places section with search query
+      const placesSection = document.getElementById('places');
+      if (placesSection) {
+        placesSection.scrollIntoView({ behavior: 'smooth' });
+      }
+      // We'll implement this in PlacesGrid component
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center">
       {/* Background Image */}
@@ -27,34 +47,64 @@ const Hero = () => {
           </p>
           
           {/* Search Box */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          <form onSubmit={handleSearch} className="mt-8 flex flex-col sm:flex-row gap-4">
             <div className="relative flex-grow">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for a destination or wonder..."
                 className="w-full pl-12 pr-4 py-3 rounded-full bg-white/90 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
               />
             </div>
-            <Button className="rounded-full text-white" size="lg">
+            <Button type="submit" className="rounded-full text-white" size="lg">
               Explore Now <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </div>
+          </form>
           
           {/* Quick Links */}
           <div className="flex flex-wrap gap-4 pt-4">
             <span className="text-white font-medium">Popular:</span>
-            <a href="#" className="text-white/80 hover:text-white hover:underline transition">
+            <a 
+              href="#places" 
+              onClick={(e) => {
+                e.preventDefault();
+                onCategorySelect("Natural Wonder");
+              }}
+              className="text-white/80 hover:text-white hover:underline transition"
+            >
               Natural Wonders
             </a>
-            <a href="#" className="text-white/80 hover:text-white hover:underline transition">
-              Abandoned Places
+            <a 
+              href="#places" 
+              onClick={(e) => {
+                e.preventDefault();
+                onCategorySelect("Architectural Marvel");
+              }}
+              className="text-white/80 hover:text-white hover:underline transition"
+            >
+              Architectural Marvels
             </a>
-            <a href="#" className="text-white/80 hover:text-white hover:underline transition">
-              Archaeological Sites
+            <a 
+              href="#places" 
+              onClick={(e) => {
+                e.preventDefault();
+                onCategorySelect("Historical Site");
+              }}
+              className="text-white/80 hover:text-white hover:underline transition"
+            >
+              Historical Sites
             </a>
-            <a href="#" className="text-white/80 hover:text-white hover:underline transition">
-              Unusual Museums
+            <a 
+              href="#places" 
+              onClick={(e) => {
+                e.preventDefault();
+                onCategorySelect("Hidden Gem");
+              }}
+              className="text-white/80 hover:text-white hover:underline transition"
+            >
+              Hidden Gems
             </a>
           </div>
         </div>

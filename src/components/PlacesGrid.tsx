@@ -60,11 +60,22 @@ const placesData = [
 // Extract unique categories from places data
 const uniqueCategories = [...new Set(placesData.map(place => place.category))];
 
-const PlacesGrid = () => {
+interface PlacesGridProps {
+  selectedCategory?: string | null;
+}
+
+const PlacesGrid = ({ selectedCategory }: PlacesGridProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [filteredPlaces, setFilteredPlaces] = useState(placesData);
 
+  // When selectedCategory prop changes, update the selectedCategories state
+  useEffect(() => {
+    if (selectedCategory) {
+      setSelectedCategories([selectedCategory]);
+    }
+  }, [selectedCategory]);
+  
   // Filter places based on search query and selected categories
   useEffect(() => {
     let results = placesData;
