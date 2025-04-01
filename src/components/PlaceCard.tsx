@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useToast } from "@/hooks/use-toast";
 
 interface PlaceCardProps {
   id: string;
@@ -23,15 +24,42 @@ const PlaceCard = ({
   category,
   className,
 }: PlaceCardProps) => {
+  const [liked, setLiked] = useState(false);
+  const { toast } = useToast();
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent card click event from firing
+    setLiked(!liked);
+    
+    toast({
+      title: liked ? "Removed from favorites" : "Added to favorites",
+      description: liked ? `${title} has been removed from your favorites` : `${title} has been added to your favorites`,
+      duration: 3000,
+    });
+  };
+
   return (
-    <div className={cn("place-card group", className)}>
-      <div className="overflow-hidden">
-        <img src={imageUrl} alt={title} className="place-card-image" />
+    <div className={cn("place-card group relative", className)}>
+      <div className="overflow-hidden rounded-lg">
+        <img 
+          src={imageUrl} 
+          alt={title} 
+          className="place-card-image h-64 w-full object-cover transition-transform duration-300 group-hover:scale-110" 
+        />
       </div>
       
       <div className="absolute top-4 right-4">
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-black/20 hover:bg-black/40 text-white">
-          <Heart className="h-4 w-4" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={cn(
+            "h-8 w-8 rounded-full bg-black/20 hover:bg-black/40",
+            liked ? "text-red-500" : "text-white"
+          )}
+          onClick={handleLike}
+          aria-label={liked ? "Remove from favorites" : "Add to favorites"}
+        >
+          <Heart className={cn("h-4 w-4", liked ? "fill-current" : "")} />
         </Button>
       </div>
       
