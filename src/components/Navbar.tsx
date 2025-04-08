@@ -40,7 +40,7 @@ const Navbar = () => {
             <Link to="/" className="nav-link font-medium">Home</Link>
             <a href="/#places" className="nav-link font-medium">Places</a>
             <Link to="/experiences" className="nav-link font-medium">Experiences</Link>
-            <a href="/#stories" className="nav-link font-medium">Stories</a>
+            <Link to="/stories" className="nav-link font-medium">Stories</Link>
             <a href="/#mapexplorer" className="nav-link font-medium">Map Explorer</a>
           </nav>
 
@@ -84,7 +84,7 @@ const Navbar = () => {
             <Link to="/" className="block py-2 font-medium">Home</Link>
             <a href="/#places" className="block py-2 font-medium">Places</a>
             <Link to="/experiences" className="block py-2 font-medium">Experiences</Link>
-            <a href="/#stories" className="block py-2 font-medium">Stories</a>
+            <Link to="/stories" className="block py-2 font-medium">Stories</Link>
             <a href="/#mapexplorer" className="block py-2 font-medium">Map Explorer</a>
             <div className="pt-4 flex items-center justify-between">
               <Button variant="outline" size="sm" className="w-full">
