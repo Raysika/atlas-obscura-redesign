@@ -68,20 +68,33 @@ const MapExplorer = () => {
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          <LocationsSidebar onLocationSelect={handleLocationSelect} />
-          <main className="flex-1 relative overflow-hidden">
-            <MapView 
-              onLocationSelect={handleLocationSelect} 
-              selectedLocation={selectedLocation}
-              mapboxToken={mapboxToken}
-            />
-            <LocationInfoCard 
-              location={selectedLocation} 
-              isOpen={isInfoCardOpen} 
-              onClose={handleCloseInfoCard}
-            />
-          </main>
+        <div className="flex-1 flex flex-col">
+          <div className="bg-muted/30 px-4 py-6 md:py-8 border-b border-border">
+            <div className="container mx-auto">
+              <h1 className="text-3xl md:text-4xl font-serif mb-2">Map Explorer</h1>
+              <p className="text-muted-foreground max-w-3xl">
+                I've designed a sleek Map Explorer tab with an interactive world map, searchable location list, and detailed info cards. 
+                The interface includes a side panel with filtering options, a Mapbox-powered map with markers, and smooth transitions. 
+                Users can set their Mapbox token for security, and the implementation features responsive design with mobile support.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+            <LocationsSidebar onLocationSelect={handleLocationSelect} />
+            <main className="flex-1 relative overflow-hidden">
+              <MapView 
+                onLocationSelect={handleLocationSelect} 
+                selectedLocation={selectedLocation}
+                mapboxToken={mapboxToken}
+              />
+              <LocationInfoCard 
+                location={selectedLocation} 
+                isOpen={isInfoCardOpen} 
+                onClose={handleCloseInfoCard}
+              />
+            </main>
+          </div>
         </div>
       )}
       
