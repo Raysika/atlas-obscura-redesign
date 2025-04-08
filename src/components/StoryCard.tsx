@@ -17,9 +17,10 @@ export interface StoryData {
 
 interface StoryCardProps {
   story: StoryData;
+  onReadFullStory: (story: StoryData) => void;
 }
 
-const StoryCard = ({ story }: StoryCardProps) => {
+const StoryCard = ({ story, onReadFullStory }: StoryCardProps) => {
   return (
     <Card className="overflow-hidden h-full flex flex-col hover:shadow-lg transition-all duration-300">
       <div className="relative h-48 overflow-hidden">
@@ -58,7 +59,11 @@ const StoryCard = ({ story }: StoryCardProps) => {
       </CardContent>
       
       <CardFooter className="p-5 pt-0 border-t border-gray-100 mt-auto">
-        <Button className="w-full flex items-center justify-center" variant="outline">
+        <Button 
+          className="w-full flex items-center justify-center" 
+          variant="outline"
+          onClick={() => onReadFullStory(story)}
+        >
           <BookOpen className="h-4 w-4 mr-2" />
           Read Full Story
         </Button>

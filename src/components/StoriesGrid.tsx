@@ -5,6 +5,7 @@ import StoryCard, { StoryData } from './StoryCard';
 interface StoriesGridProps {
   searchQuery: string;
   selectedCategory: string | null;
+  onSelectStory: (story: StoryData) => void;
 }
 
 const storiesData: StoryData[] = [
@@ -100,7 +101,7 @@ const storiesData: StoryData[] = [
   }
 ];
 
-const StoriesGrid = ({ searchQuery, selectedCategory }: StoriesGridProps) => {
+const StoriesGrid = ({ searchQuery, selectedCategory, onSelectStory }: StoriesGridProps) => {
   const [filteredStories, setFilteredStories] = useState<StoryData[]>(storiesData);
 
   useEffect(() => {
@@ -143,7 +144,11 @@ const StoriesGrid = ({ searchQuery, selectedCategory }: StoriesGridProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredStories.map(story => (
-            <StoryCard key={story.id} story={story} />
+            <StoryCard 
+              key={story.id} 
+              story={story}
+              onReadFullStory={onSelectStory}
+            />
           ))}
         </div>
       )}
