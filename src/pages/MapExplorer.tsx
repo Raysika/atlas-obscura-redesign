@@ -11,14 +11,14 @@ import { getLocations } from '@/utils/locationData';
 import { useIsMobile } from '@/hooks/use-mobile';
 import MapView from '@/components/MapView';
 
-// Default public Mapbox token for demonstration purposes
-const DEFAULT_MAPBOX_TOKEN = 'pk.eyJ1IjoibG92YWJsZS1haSIsImEiOiJjbHkxbHdhNmwwNDF0MnFxaW53MXVsZ2liIn0.a5Q4EuE2EffpP2g0LiJbnA';
+// More reliable Mapbox token for public maps
+const DEFAULT_MAPBOX_TOKEN = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 const MapExplorer = () => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [isInfoCardOpen, setIsInfoCardOpen] = useState(false);
   const [mapboxToken, setMapboxToken] = useState<string>(DEFAULT_MAPBOX_TOKEN);
-  const [isTokenSet, setIsTokenSet] = useState(true); // Set to true by default now
+  const [isTokenSet, setIsTokenSet] = useState(true);
   const [locations, setLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
@@ -89,7 +89,8 @@ const MapExplorer = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-1 flex flex-col">
+      {/* Add padding-top to prevent content overlap with fixed navbar */}
+      <div className="flex-1 flex flex-col pt-16 md:pt-20">
         <div className="bg-muted/30 px-4 py-6 md:py-8 border-b border-border">
           <div className="container mx-auto">
             <h1 className="text-3xl md:text-4xl font-serif mb-2">Map Explorer</h1>

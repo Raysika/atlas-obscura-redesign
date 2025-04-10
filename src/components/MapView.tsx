@@ -16,6 +16,7 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
   const [isLoading, setIsLoading] = useState(true);
   const [locations, setLocations] = useState<Location[]>([]);
   const markersRef = useRef<any[]>([]);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadLocations = async () => {
@@ -35,6 +36,7 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
 
     const initializeMap = async () => {
       setIsLoading(true);
+      setMapError(null);
       
       try {
         // Dynamically import mapbox-gl to ensure it only loads in the browser
@@ -47,11 +49,18 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
         
         map.current = new mapboxgl.default.Map({
           container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/outdoors-v12',
+          style: 'mapbox://styles/mapbox/streets-v12', // Use more reliable style
           center: [0, 20],
           zoom: 1.5,
           projection: 'globe',
           attributionControl: false
+        });
+
+        // Add error handler
+        map.current.on('error', (e: any) => {
+          console.error('Mapbox error:', e);
+          setMapError('Error loading map. Please check your connection.');
+          setIsLoading(false);
         });
 
         // Add navigation controls
@@ -110,9 +119,20 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
           setIsLoading(false);
         });
 
+        // Set a timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          if (isLoading) {
+            setIsLoading(false);
+            if (!mapError) {
+              setMapError('Map loading timed out. Please refresh the page to try again.');
+            }
+          }
+        }, 10000);
+
         // Clean up
         return () => {
           clearInterval(spinInterval);
+          clearTimeout(timeoutId);
           if (map.current) {
             map.current.remove();
             map.current = null;
@@ -120,12 +140,13 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
         };
       } catch (error) {
         console.error('Error initializing map:', error);
+        setMapError('Failed to initialize map. Please try again later.');
         setIsLoading(false);
       }
     };
 
     initializeMap();
-  }, [mapboxToken]);
+  }, [mapboxToken, isLoading, mapError]);
 
   // Add location markers to the map
   useEffect(() => {
@@ -204,7 +225,7 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
   }, [selectedLocation]);
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-[70vh] relative">
       <div ref={mapContainer} className="absolute inset-0" />
       
       {isLoading && (
@@ -212,6 +233,17 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
           <div className="flex flex-col items-center">
             <Loader className="h-8 w-8 animate-spin text-primary mb-2" />
             <p className="text-sm text-muted-foreground">Loading map...</p>
+          </div>
+        </div>
+      )}
+
+      {mapError && !isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/90 z-10">
+          <div className="text-center p-6 max-w-md">
+            <p className="text-destructive mb-2">{mapError}</p>
+            <Button onClick={() => setIsLoading(true)} size="sm">
+              Try Again
+            </Button>
           </div>
         </div>
       )}
