@@ -1,8 +1,8 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from 'lucide-react';
 import { Location } from '@/types/location';
 import { getLocations } from '@/utils/locationData';
+import { Button } from '@/components/ui/button';
 
 interface MapViewProps {
   onLocationSelect: (location: Location) => void;
@@ -39,7 +39,6 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
       setMapError(null);
       
       try {
-        // Dynamically import mapbox-gl to ensure it only loads in the browser
         const mapboxgl = await import('mapbox-gl');
         await import('mapbox-gl/dist/mapbox-gl.css');
         
@@ -49,21 +48,19 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
         
         map.current = new mapboxgl.default.Map({
           container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v12', // Use more reliable style
+          style: 'mapbox://styles/mapbox/streets-v12',
           center: [0, 20],
           zoom: 1.5,
           projection: 'globe',
           attributionControl: false
         });
 
-        // Add error handler
         map.current.on('error', (e: any) => {
           console.error('Mapbox error:', e);
           setMapError('Error loading map. Please check your connection.');
           setIsLoading(false);
         });
 
-        // Add navigation controls
         map.current.addControl(
           new mapboxgl.default.NavigationControl({
             visualizePitch: true
@@ -71,10 +68,8 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
           'top-right'
         );
 
-        // Add fullscreen control
         map.current.addControl(new mapboxgl.default.FullscreenControl(), 'top-right');
 
-        // Add atmosphere styling
         map.current.on('style.load', () => {
           map.current.setFog({
             color: 'rgb(255, 255, 255)',
@@ -83,7 +78,6 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
           });
         });
 
-        // Auto rotation settings
         const secondsPerRevolution = 360;
         const maxSpinZoom = 5;
         let userInteracting = false;
@@ -105,10 +99,8 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
           }
         }
 
-        // Start spinning animation
         const spinInterval = setInterval(spinGlobe, 1000);
 
-        // Handle interaction with the map
         map.current.on('mousedown', () => {
           userInteracting = true;
           spinEnabled = false;
@@ -119,7 +111,6 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
           setIsLoading(false);
         });
 
-        // Set a timeout to prevent infinite loading
         const timeoutId = setTimeout(() => {
           if (isLoading) {
             setIsLoading(false);
@@ -129,7 +120,6 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
           }
         }, 10000);
 
-        // Clean up
         return () => {
           clearInterval(spinInterval);
           clearTimeout(timeoutId);
@@ -148,22 +138,17 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
     initializeMap();
   }, [mapboxToken, isLoading, mapError]);
 
-  // Add location markers to the map
   useEffect(() => {
     if (!map.current || !locations.length || isLoading) return;
 
     const addMarkers = async () => {
       try {
-        // Clear existing markers
         markersRef.current.forEach(marker => marker.remove());
         markersRef.current = [];
 
-        // Import mapbox-gl
         const mapboxgl = await import('mapbox-gl');
 
-        // Add markers for each location
         locations.forEach(location => {
-          // Create custom marker element
           const markerEl = document.createElement('div');
           markerEl.className = 'group';
           markerEl.innerHTML = `
@@ -176,14 +161,12 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
               <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary/90 rotate-45 mb-[-4px]"></div>
             </div>
           `;
-          
-          // Create tooltip element
+
           const tooltip = document.createElement('div');
           tooltip.className = 'absolute bottom-full left-1/2 transform -translate-x-1/2 bg-white py-1 px-2 rounded shadow-md text-xs whitespace-nowrap mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300';
           tooltip.textContent = location.title;
           markerEl.appendChild(tooltip);
 
-          // Create and add the marker to the map
           const marker = new mapboxgl.default.Marker({
             element: markerEl,
             anchor: 'bottom'
@@ -191,12 +174,10 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
             .setLngLat(location.coordinates)
             .addTo(map.current);
 
-          // Add click event to marker
           markerEl.addEventListener('click', () => {
             onLocationSelect(location);
           });
           
-          // Store reference to marker for later removal
           markersRef.current.push(marker);
         });
       } catch (error) {
@@ -207,7 +188,6 @@ const MapView = ({ onLocationSelect, selectedLocation, mapboxToken }: MapViewPro
     addMarkers();
   }, [locations, isLoading, onLocationSelect]);
 
-  // Fly to selected location
   useEffect(() => {
     if (!map.current || !selectedLocation) return;
 
